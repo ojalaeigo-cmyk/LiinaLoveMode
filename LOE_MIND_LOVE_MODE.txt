@@ -1,0 +1,15 @@
+STAR KING - LOVE MODE
+
+See on lollakas positiivne versioon:
+- ühtegi punast ega halba asja ei ole;
+- püüad ainult kollaseid tähti;
+- iga püütud täht annab +10 punkti;
+- iga 50 püütud tähte annab automaatselt +500 punkti;
+- iga 1 000 000 punkti järel ilmub tekst:
+  Armastand sind kallis
+- Screen Always On loogika on sees.
+
+GitHub:
+Lae üles selle kausta sees olevad failid repo juurkausta.
+Testlink:
+https://ojalaeigo-cmyk.github.io/kogut-hti/?lovemode=1

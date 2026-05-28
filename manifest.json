@@ -1,0 +1,23 @@
+{
+  "name": "Star King Love Mode",
+  "short_name": "Star King",
+  "description": "Star King Love Mode: only yellow stars, no bad objects.",
+  "start_url": "./?lovemode=1",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#071018",
+  "theme_color": "#071018",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
