@@ -1,11 +1,11 @@
 {
   "name": "LOVE Liina",
   "short_name": "LOVE Liina",
-  "start_url": "./?boss40x_redheart=1",
+  "start_url": "./?scaryboss_scifiships=1",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#071018",
   "theme_color": "#071018",
-  "description": "LOVE Liina: boss 40x stronger and red heart at level 5 end."
+  "description": "LOVE Liina: scarier boss and prettier sci-fi inspired ships."
 }

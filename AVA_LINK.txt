@@ -1,12 +1,11 @@
 Lae need failid LiinaLoveMode repo juurkausta.
 
 Ava pärast:
-https://ojalaeigo-cmyk.github.io/LiinaLoveMode/?boss40x_redheart=1
+https://ojalaeigo-cmyk.github.io/LiinaLoveMode/?scaryboss_scifiships=1
 
 Muudatused:
-- koll on nüüd 40x tugevam;
-- viienda leveli lõpus ilmub suur punane süda;
-- max level on 5;
-- südame võtmine muudab laeva kuju;
-- kolli saab tulistada;
-- kolli hävitamine annab relva tugevust juurde.
+- koll on tehtud hirmsamaks;
+- laevad on tehtud ilusamaks sci-fi stiilis;
+- kasutatud on originaalseid inspireeritud kujundusi, mitte otseseid koopiaid;
+- boss on endiselt 40x tugevam;
+- 5. leveli lõpus ilmub punane süda.
