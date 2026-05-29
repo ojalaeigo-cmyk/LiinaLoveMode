@@ -1,127 +1,66 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="et">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>LOVE Liina</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#071018">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
-html,body{width:100%;height:100%;overflow:hidden;background:#071018;font-family:Arial,sans-serif}
-#wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at top,#244869,#071018 70%)}
-canvas{width:100vw;height:100vh;max-width:520px;background:#102033;touch-action:none}
-#hud{position:fixed;top:10px;left:50%;transform:translateX(-50%);width:min(94vw,500px);display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;color:white;font-weight:bold;font-size:13px;text-align:center;text-shadow:0 2px 3px #000;z-index:5;pointer-events:none}
-.box{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:7px}
-#level{position:fixed;top:82px;left:50%;transform:translateX(-50%);width:min(92vw,480px);color:white;text-align:center;z-index:5;font-weight:bold;text-shadow:0 2px 3px #000;pointer-events:none}
-#lvlName{color:#ffd966}.bar{height:8px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden;margin-top:6px}.bar>div{height:100%;width:0;background:linear-gradient(90deg,#8fd7ff,#ffd966)}
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-user-select:none}html,body{width:100%;height:100%;overflow:hidden;background:#071018;font-family:Arial,sans-serif}
+#wrap{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:radial-gradient(circle at top,#244869,#071018 70%)}canvas{width:100vw;height:100vh;max-width:520px;background:#102033;touch-action:none}
+#hud{position:fixed;top:10px;left:50%;transform:translateX(-50%);width:min(94vw,500px);display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;color:#fff;font-weight:bold;font-size:13px;text-align:center;text-shadow:0 2px 3px #000;z-index:5;pointer-events:none}.box{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:7px}
+#info{position:fixed;top:84px;left:50%;transform:translateX(-50%);width:min(92vw,480px);color:#fff;text-align:center;z-index:5;font-weight:bold;text-shadow:0 2px 3px #000;pointer-events:none}.bar{height:8px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden;margin-top:6px}.bar>div{height:100%;width:0;background:linear-gradient(90deg,#8fd7ff,#ffd966)}
 #pauseBtn{position:fixed;top:124px;right:calc(50% - min(47vw,250px));z-index:8;display:none;border:1px solid rgba(255,255,255,.24);background:rgba(0,0,0,.5);color:white;border-radius:999px;padding:8px 11px;font-size:16px;font-weight:bold}
-.visible{display:block!important}.screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);z-index:20;color:white;text-align:center;padding:22px}
-.panel{width:min(92vw,470px);max-height:88vh;overflow:auto;background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.07));border:1px solid rgba(255,255,255,.22);border-radius:26px;padding:24px 18px;box-shadow:0 22px 60px rgba(0,0,0,.45)}
-h1{font-size:38px;color:#ffd966;margin-bottom:8px}.panel p{font-size:14px;line-height:1.35;margin-bottom:9px;opacity:.94}
-.legend{display:grid;gap:6px;text-align:left;margin:10px 0}.legend div{background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.13);border-radius:13px;padding:7px 9px;font-size:13px}
-button{border:0;border-radius:999px;padding:15px 28px;font-size:18px;font-weight:bold;background:#fff;color:#111;cursor:pointer;margin-top:4px}
-.small{font-size:12px!important;opacity:.75!important}.hidden{display:none!important}.yellow{color:#ffd966}.green{color:#8cffb1}.pink{color:#ffb3d9}
+#controls{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);width:min(94vw,500px);display:none;grid-template-columns:1fr 1fr;gap:16px;z-index:9}
+#controls button{height:64px;border:1px solid rgba(255,255,255,.3);background:rgba(0,0,0,.42);color:white;border-radius:20px;font-size:30px;font-weight:bold}
+.screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);z-index:20;color:white;text-align:center;padding:22px}.panel{width:min(92vw,470px);max-height:88vh;overflow:auto;background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.07));border:1px solid rgba(255,255,255,.22);border-radius:26px;padding:24px 18px}h1{font-size:38px;color:#ffd966;margin-bottom:8px}.panel p{font-size:14px;line-height:1.35;margin-bottom:9px}.legend{display:grid;gap:6px;text-align:left;margin:10px 0}.legend div{background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.13);border-radius:13px;padding:7px 9px;font-size:13px}button{border:0;border-radius:999px;padding:15px 28px;font-size:18px;font-weight:bold;background:white;color:#111;cursor:pointer}.hidden{display:none!important}.visible{display:block!important}.gridvisible{display:grid!important}.yellow{color:#ffd966}.green{color:#8cffb1}.pink{color:#ffb3d9}.small{font-size:12px!important;opacity:.8!important}
 </style>
 </head>
 <body>
 <div id="wrap"><canvas id="game"></canvas></div>
-<div id="hud">
-  <div class="box">Punktid<br><span id="score" class="yellow">0</span></div>
-  <div class="box">Tähed<br><span id="stars" class="green">0</span></div>
-  <div class="box">Parim<br><span id="best" class="pink">0</span></div>
-</div>
-<div id="level"><div id="lvlName">LOVE Liina</div><div class="bar"><div id="prog"></div></div></div>
-<button id="pauseBtn">⏸</button>
-
-<div id="start" class="screen">
-  <div class="panel">
-    <h1>LOVE Liina</h1>
-    <p><b>Armas tähemäng.</b> Ainult kollased tähed. Ühtegi punast ega halba asja ei ole.</p>
-    <div class="legend">
-      <div>⭐ Iga täht annab +10 punkti.</div>
-      <div>🎁 Iga 50 püütud tähte annab automaatselt +5000 punkti.</div>
-      <div>💛 Iga 100 püütud tähte näitab: <b>Armastand sind kallis</b></div>
-      <div>✨ Iga 500 püütud tähte näitab: <b>Sa oled mu täht</b></div>
-    </div>
-    <p id="screenWakeMarker" class="small" style="color:#8cffb1;font-weight:bold">SCREEN ALWAYS ON MODE</p>
-    <p id="wakeStatus" class="small" style="color:#ffd966">Ekraanilukk: ootab alustamist</p>
-    <button id="startBtn">Alusta</button>
-  </div>
-</div>
-
+<div id="hud"><div class="box">Punktid<br><span id="score" class="yellow">0</span></div><div class="box">Tähed<br><span id="stars" class="green">0</span></div><div class="box">Parim<br><span id="best" class="pink">0</span></div></div>
+<div id="info"><div id="label">LOVE Liina</div><div class="bar"><div id="prog"></div></div></div>
+<button id="pauseBtn">⏸</button><div id="controls"><button id="leftBtn">◀</button><button id="rightBtn">▶</button></div>
+<div id="start" class="screen"><div class="panel"><h1>LOVE Liina</h1><p><b>Parandatud juhtimisega versioon.</b> Alumine liikur liigub sõrmega, ekraani puudutusega ja ◀ ▶ nuppudega.</p><div class="legend"><div>⭐ Iga täht annab +10 punkti.</div><div>🎁 Iga 50 tähte annab +5000 punkti.</div><div>💛 Iga 100 tähte: <b>Armastand sind kallis</b></div><div>✨ Iga 500 tähte: <b>Sa oled mu täht</b></div></div><p id="wakeStatus" class="small" style="color:#ffd966">Ekraanilukk: ootab alustamist</p><button id="startBtn">Alusta</button></div></div>
 <div id="pauseScreen" class="screen hidden"><div class="panel"><h1>Paus</h1><p>Mäng on peatatud.</p><button id="resumeBtn">Jätka</button></div></div>
 <div id="over" class="screen hidden"><div class="panel"><h1>Mäng läbi</h1><p>Punktid: <b><span id="finalScore">0</span></b></p><p>Tähed: <b><span id="finalStars">0</span></b></p><button id="againBtn">Mängi uuesti</button></div></div>
-
 <script>
-(function(){
-"use strict";
-const canvas=document.getElementById("game"),ctx=canvas.getContext("2d"),$=id=>document.getElementById(id);
-let W=360,H=640,S=1,frame=0,running=false,paused=false;
-let score=0,stars=0,best=Number(localStorage.getItem("love_liina_best")||0);
-let items=[],parts=[],texts=[],spawnT=0;
-let tilt=0,hasTilt=false,touch=false;
-let player={x:180,y:560,w:68,h:32,targetX:180,color:"#2e9fdb"};
-let wakeLock=null,wakeTimer=null,keepVid=null,keepCan=null,keepCtx=null,keepFrame=0;
-
-function wakeStatus(t){let e=$("wakeStatus");if(e)e.textContent=t}
-async function wake(){try{fallback();if("wakeLock"in navigator){wakeLock=await navigator.wakeLock.request("screen");wakeStatus("Ekraanilukk: aktiivne mängimise ajal");if(wakeLock.addEventListener)wakeLock.addEventListener("release",()=>{wakeLock=null;if(running)setTimeout(wake,500)});return}}catch(e){}wakeStatus("Ekraanilukk: varurežiim aktiivne")}
-function fallback(){try{if(keepVid)return;keepCan=document.createElement("canvas");keepCan.width=2;keepCan.height=2;keepCan.style.cssText="position:fixed;left:-20px;top:-20px;width:1px;height:1px;opacity:0";document.body.appendChild(keepCan);keepCtx=keepCan.getContext("2d");keepVid=document.createElement("video");keepVid.muted=true;keepVid.loop=true;keepVid.autoplay=true;keepVid.setAttribute("playsinline","");keepVid.style.cssText=keepCan.style.cssText;document.body.appendChild(keepVid);let st=keepCan.captureStream?keepCan.captureStream(1):null;if(st){keepVid.srcObject=st;keepVid.play().catch(()=>{})}function tick(){if(!running)return;keepFrame++;if(keepCtx){keepCtx.fillStyle=keepFrame%2?"#000":"#111";keepCtx.fillRect(0,0,2,2)}setTimeout(tick,1000)}tick()}catch(e){}}
-function startWake(){wake();if(wakeTimer)clearInterval(wakeTimer);wakeTimer=setInterval(()=>{if(running)wake()},4000)}
-async function stopWake(){if(wakeTimer)clearInterval(wakeTimer);wakeTimer=null;try{if(wakeLock)await wakeLock.release()}catch(e){}wakeLock=null;if(keepVid){keepVid.pause();keepVid.remove();keepVid=null}if(keepCan){keepCan.remove();keepCan=null}wakeStatus("Ekraanilukk: mitteaktiivne")}
-
-function resize(){let cw=Math.min(innerWidth,520),ch=innerHeight;canvas.width=cw;canvas.height=ch;canvas.style.width=cw+"px";canvas.style.height=ch+"px";W=cw;H=ch;S=W/360;player.y=H-92}addEventListener("resize",resize);resize();
-function rand(a,b){return Math.random()*(b-a)+a}function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
-function addText(x,y,t,b=false){texts.push({x,y,t,life:b?150:55,b})}
-function boom(x,y){for(let i=0;i<18;i++)parts.push({x,y,vx:rand(-2.8,2.8)*S,vy:rand(-2.8,2.8)*S,r:rand(2,4)*S,life:26})}
-function hud(){$("score").textContent=score;$("stars").textContent=stars;$("best").textContent=best;$("prog").style.width=((stars%50)/50*100)+"%";$("lvlName").textContent="LOVE Liina — järgmine +5000 boonus: "+(50-stars%50)+" tähte";}
-function start(){score=0;stars=0;items=[];parts=[];texts=[];spawnT=0;player.x=W/2;player.targetX=W/2;running=true;paused=false;$("start").classList.add("hidden");$("over").classList.add("hidden");$("pauseScreen").classList.add("hidden");$("pauseBtn").classList.add("visible");startWake();hud()}
-function gameOver(){stopWake();running=false;if(score>best){best=score;localStorage.setItem("love_liina_best",best)}$("finalScore").textContent=score;$("finalStars").textContent=stars;$("pauseBtn").classList.remove("visible");$("over").classList.remove("hidden")}
+(()=>{"use strict";
+const c=document.getElementById("game"),x=c.getContext("2d"),$=id=>document.getElementById(id);
+let W=360,H=640,S=1,left=0,frame=0,running=false,paused=false,score=0,stars=0,best=+(localStorage.love_liina_best_fixed||0),items=[],parts=[],texts=[],spawnT=0,touch=false,leftHeld=false,rightHeld=false,tilt=0,hasTilt=false;
+let p={x:180,y:560,w:74,h:34,targetX:180,color:"#2e9fdb"};
+let wakeLock=null,wakeTimer=null,vid=null,can=null,ctx2=null,kf=0;
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}function rand(a,b){return Math.random()*(b-a)+a}
+function resize(){W=Math.min(innerWidth,520);H=innerHeight;c.width=W;c.height=H;c.style.width=W+"px";c.style.height=H+"px";left=(innerWidth-W)/2;S=W/360;p.y=H-118;p.x=clamp(p.x,p.w*S/2,W-p.w*S/2);p.targetX=p.x}addEventListener("resize",resize);resize();
+function sx(clientX){return clamp(clientX-left,p.w*S/2,W-p.w*S/2)}
+function ws(t){$("wakeStatus").textContent=t}
+async function wake(){fallback();try{if("wakeLock"in navigator){wakeLock=await navigator.wakeLock.request("screen");ws("Ekraanilukk: aktiivne");if(wakeLock.addEventListener)wakeLock.addEventListener("release",()=>{wakeLock=null;if(running)setTimeout(wake,500)});return}}catch(e){}ws("Ekraanilukk: varurežiim")}
+function fallback(){try{if(vid)return;can=document.createElement("canvas");can.width=2;can.height=2;can.style.cssText="position:fixed;left:-20px;top:-20px;width:1px;height:1px;opacity:0";document.body.appendChild(can);ctx2=can.getContext("2d");vid=document.createElement("video");vid.muted=true;vid.loop=true;vid.autoplay=true;vid.setAttribute("playsinline","");vid.style.cssText=can.style.cssText;document.body.appendChild(vid);let st=can.captureStream?can.captureStream(1):null;if(st){vid.srcObject=st;vid.play().catch(()=>{})}function tick(){if(!running)return;kf++;ctx2.fillStyle=kf%2?"#000":"#111";ctx2.fillRect(0,0,2,2);setTimeout(tick,1000)}tick()}catch(e){}}
+function startWake(){wake();clearInterval(wakeTimer);wakeTimer=setInterval(()=>{if(running)wake()},4000)}
+async function stopWake(){clearInterval(wakeTimer);wakeTimer=null;try{if(wakeLock)await wakeLock.release()}catch(e){}if(vid){vid.pause();vid.remove();vid=null}if(can){can.remove();can=null}ws("Ekraanilukk: mitteaktiivne")}
+function hud(){$("score").textContent=score;$("stars").textContent=stars;$("best").textContent=best;$("prog").style.width=((stars%50)/50*100)+"%";$("label").textContent="LOVE Liina — järgmine +5000: "+(50-stars%50)+" tähte"}
+function start(){score=0;stars=0;items=[];parts=[];texts=[];spawnT=0;p.x=W/2;p.targetX=W/2;running=true;paused=false;$("start").classList.add("hidden");$("over").classList.add("hidden");$("pauseScreen").classList.add("hidden");$("pauseBtn").classList.add("visible");$("controls").classList.add("gridvisible");startWake();hud()}
+function over(){stopWake();running=false;if(score>best){best=score;localStorage.love_liina_best_fixed=best}$("finalScore").textContent=score;$("finalStars").textContent=stars;$("pauseBtn").classList.remove("visible");$("controls").classList.remove("gridvisible");$("over").classList.remove("hidden")}
 function togglePause(){if(!running)return;paused=!paused;if(!paused)startWake();$("pauseScreen").classList.toggle("hidden",!paused);$("pauseBtn").textContent=paused?"▶":"⏸"}
-
+function addText(px,py,t,b=false){texts.push({x:px,y:py,t,life:b?150:55,b})}
+function boom(px,py){for(let i=0;i<18;i++)parts.push({x:px,y:py,vx:rand(-2.8,2.8)*S,vy:rand(-2.8,2.8)*S,r:rand(2,4)*S,life:26})}
 function spawn(){items.push({x:rand(28*S,W-28*S),y:-35*S,r:12*S,vy:(1.75+Math.min(1.2,stars/700)+rand(0,.55))*S,spin:rand(0,6.28)})}
-function collect(i){
-  stars++;
-  score+=10;
-  boom(i.x,i.y);
-  addText(i.x,i.y,"+10");
-  if(stars%50===0){score+=5000;addText(W/2,H*.30,"+5000 LOVE BONUS",true)}
-  if(stars%100===0){addText(W/2,H*.42,"Armastand sind kallis",true)}
-  if(stars%500===0){addText(W/2,H*.50,"Sa oled mu täht",true)}
-}
-function hit(c,r){let x=clamp(c.x,r.x-r.w/2,r.x+r.w/2),y=clamp(c.y,r.y-r.h/2,r.y+r.h/2),dx=c.x-x,dy=c.y-y;return dx*dx+dy*dy<c.r*c.r}
-
-function update(){if(!running||paused)return;
-  if(hasTilt&&!touch)player.targetX=W/2+tilt*(W*.42);
-  let min=player.w*S/2,max=W-player.w*S/2;player.targetX=clamp(player.targetX,min,max);
-  let dx=player.targetX-player.x;player.x+=clamp(dx*.18,-8*S,8*S);player.x=clamp(player.x,min,max);
-  spawnT++;if(spawnT>Math.max(18,30-Math.floor(stars/120))){spawnT=0;spawn()}
-  for(let i of items){i.y+=i.vy;i.spin+=.06}
-  let box={x:player.x,y:player.y,w:player.w*S,h:player.h*S};
-  for(let i of items)if(!i.dead&&hit(i,box)){i.dead=true;collect(i)}
-  items=items.filter(i=>!i.dead&&i.y<H+70);
-  for(let p of parts){p.x+=p.vx;p.y+=p.vy;p.life--}parts=parts.filter(p=>p.life>0);
-  for(let t of texts){t.y-=.25*S;t.life--}texts=texts.filter(t=>t.life>0);
-  hud();
-}
-function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath()}
-function bg(){let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,"#1b3d5d");g.addColorStop(1,"#071018");ctx.fillStyle=g;ctx.fillRect(0,0,W,H);for(let i=0;i<34;i++){ctx.fillStyle=i%4?"rgba(255,255,255,.09)":"rgba(255,217,102,.22)";ctx.beginPath();ctx.arc((i*73+frame*.13)%W,60+(i*89)%Math.max(120,H-140),1.5+i%3,0,6.28);ctx.fill()}}
-function star(x,y,r,rot,c="#ffd966"){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.shadowBlur=14*S;ctx.shadowColor=c;ctx.fillStyle=c;ctx.beginPath();for(let i=0;i<10;i++){let a=i*Math.PI/5-Math.PI/2,rrr=i%2?r*.45:r;ctx.lineTo(Math.cos(a)*rrr,Math.sin(a)*rrr)}ctx.closePath();ctx.fill();ctx.restore()}
-function draw(){ctx.clearRect(0,0,W,H);bg();for(let i of items)star(i.x,i.y,i.r,i.spin);for(let p of parts){ctx.globalAlpha=p.life/26;ctx.fillStyle="#ffd966";ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.28);ctx.fill();ctx.globalAlpha=1}let w=player.w*S,h=player.h*S;ctx.save();ctx.translate(player.x,player.y);ctx.fillStyle="rgba(0,0,0,.35)";ctx.beginPath();ctx.ellipse(0,h*.55,w*.6,h*.22,0,0,6.28);ctx.fill();ctx.fillStyle=player.color;rr(-w/2,-h/2,w,h,14*S);ctx.fill();ctx.fillStyle="rgba(255,255,255,.46)";rr(-w*.32,-h*.38,w*.64,h*.30,9*S);ctx.fill();ctx.restore();for(let t of texts){ctx.globalAlpha=Math.min(1,t.life/20);ctx.fillStyle=t.b?"#ffd966":"#fff";ctx.font=`bold ${(t.b?24:15)*S}px Arial`;ctx.textAlign="center";ctx.fillText(t.t,t.x,t.y);ctx.globalAlpha=1}}
+function hit(i){let rx=p.x-p.w*S/2,ry=p.y-p.h*S/2,rw=p.w*S,rh=p.h*S;let hx=clamp(i.x,rx,rx+rw),hy=clamp(i.y,ry,ry+rh),dx=i.x-hx,dy=i.y-hy;return dx*dx+dy*dy<i.r*i.r}
+function collect(i){stars++;score+=10;boom(i.x,i.y);addText(i.x,i.y,"+10");if(stars%50===0){score+=5000;addText(W/2,H*.30,"+5000 LOVE BONUS",true)}if(stars%100===0)addText(W/2,H*.42,"Armastand sind kallis",true);if(stars%500===0)addText(W/2,H*.50,"Sa oled mu täht",true)}
+function update(){if(!running||paused)return;if(leftHeld)p.targetX-=10*S;if(rightHeld)p.targetX+=10*S;if(hasTilt&&!touch&&!leftHeld&&!rightHeld)p.targetX=W/2+tilt*(W*.42);p.targetX=clamp(p.targetX,p.w*S/2,W-p.w*S/2);p.x+=clamp((p.targetX-p.x)*.24,-12*S,12*S);spawnT++;if(spawnT>Math.max(18,30-Math.floor(stars/120))){spawnT=0;spawn()}for(const i of items){i.y+=i.vy;i.spin+=.06;if(!i.dead&&hit(i)){i.dead=true;collect(i)}}items=items.filter(i=>!i.dead&&i.y<H+70);for(const q of parts){q.x+=q.vx;q.y+=q.vy;q.life--}parts=parts.filter(q=>q.life>0);for(const t of texts){t.y-=.25*S;t.life--}texts=texts.filter(t=>t.life>0);hud()}
+function rr(a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.lineTo(a+w-r,b);x.quadraticCurveTo(a+w,b,a+w,b+r);x.lineTo(a+w,b+h-r);x.quadraticCurveTo(a+w,b+h,a+w-r,b+h);x.lineTo(a+r,b+h);x.quadraticCurveTo(a,b+h,a,b+h-r);x.lineTo(a,b+r);x.quadraticCurveTo(a,b,a+r,b);x.closePath()}
+function bg(){let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,"#1b3d5d");g.addColorStop(1,"#071018");x.fillStyle=g;x.fillRect(0,0,W,H);for(let i=0;i<34;i++){x.fillStyle=i%4?"rgba(255,255,255,.09)":"rgba(255,217,102,.22)";x.beginPath();x.arc((i*73+frame*.13)%W,60+(i*89)%Math.max(120,H-140),1.5+i%3,0,6.28);x.fill()}}
+function star(px,py,r,rot){x.save();x.translate(px,py);x.rotate(rot);x.shadowBlur=14*S;x.shadowColor="#ffd966";x.fillStyle="#ffd966";x.beginPath();for(let i=0;i<10;i++){let a=i*Math.PI/5-Math.PI/2,rr=i%2?r*.45:r;x.lineTo(Math.cos(a)*rr,Math.sin(a)*rr)}x.closePath();x.fill();x.restore()}
+function draw(){x.clearRect(0,0,W,H);bg();for(const i of items)star(i.x,i.y,i.r,i.spin);for(const q of parts){x.globalAlpha=q.life/26;x.fillStyle="#ffd966";x.beginPath();x.arc(q.x,q.y,q.r,0,6.28);x.fill();x.globalAlpha=1}let w=p.w*S,h=p.h*S;x.save();x.translate(p.x,p.y);x.fillStyle="rgba(0,0,0,.35)";x.beginPath();x.ellipse(0,h*.55,w*.6,h*.22,0,0,6.28);x.fill();x.fillStyle=p.color;rr(-w/2,-h/2,w,h,14*S);x.fill();x.fillStyle="rgba(255,255,255,.46)";rr(-w*.32,-h*.38,w*.64,h*.30,9*S);x.fill();x.restore();for(const t of texts){x.globalAlpha=Math.min(1,t.life/20);x.fillStyle=t.b?"#ffd966":"#fff";x.font=`bold ${(t.b?24:15)*S}px Arial`;x.textAlign="center";x.fillText(t.t,t.x,t.y);x.globalAlpha=1}}
 function loop(){frame++;update();draw();requestAnimationFrame(loop)}
-
-canvas.addEventListener("touchstart",e=>{e.preventDefault();touch=true;player.targetX=e.touches[0].clientX-(innerWidth-W)/2},{passive:false});
-canvas.addEventListener("touchmove",e=>{e.preventDefault();touch=true;player.targetX=e.touches[0].clientX-(innerWidth-W)/2},{passive:false});
-canvas.addEventListener("touchend",e=>{e.preventDefault();touch=false},{passive:false});
-canvas.addEventListener("mousedown",e=>{touch=true;player.targetX=e.clientX-(innerWidth-W)/2});
-canvas.addEventListener("mousemove",e=>{if(touch)player.targetX=e.clientX-(innerWidth-W)/2});
-canvas.addEventListener("mouseup",()=>touch=false);
+function ptr(e){let xx=e.clientX;if(e.touches&&e.touches[0])xx=e.touches[0].clientX;p.targetX=sx(xx)}
+c.addEventListener("touchstart",e=>{e.preventDefault();touch=true;ptr(e)},{passive:false});c.addEventListener("touchmove",e=>{e.preventDefault();touch=true;ptr(e)},{passive:false});c.addEventListener("touchend",e=>{e.preventDefault();touch=false},{passive:false});
+document.addEventListener("pointerdown",e=>{if(running&&!paused&&!e.target.closest(".screen")&&!e.target.closest("#controls")&&!e.target.closest("#pauseBtn")){touch=true;ptr(e)}});document.addEventListener("pointermove",e=>{if(touch&&running&&!paused)ptr(e)});document.addEventListener("pointerup",()=>touch=false);
+function hold(btn,side){btn.addEventListener("pointerdown",e=>{e.preventDefault();side==="l"?leftHeld=true:rightHeld=true;touch=false});btn.addEventListener("pointerup",()=>{side==="l"?leftHeld=false:rightHeld=false});btn.addEventListener("pointerleave",()=>{side==="l"?leftHeld=false:rightHeld=false})}
+hold($("leftBtn"),"l");hold($("rightBtn"),"r");
 addEventListener("deviceorientation",e=>{if(typeof e.gamma==="number"){tilt=clamp(e.gamma/28,-1,1);hasTilt=true}});
-addEventListener("keydown",e=>{if(e.key==="ArrowLeft")player.targetX-=26*S;if(e.key==="ArrowRight")player.targetX+=26*S;if(e.key==="Escape")togglePause();if(e.key==="Enter"&&!running)start()});
-$("startBtn").addEventListener("click",start);$("againBtn").addEventListener("click",start);$("pauseBtn").addEventListener("click",togglePause);$("resumeBtn").addEventListener("click",togglePause);
-if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("service-worker.js").catch(()=>{}));
-$("best").textContent=best;hud();loop();
+addEventListener("keydown",e=>{if(e.key==="ArrowLeft")leftHeld=true;if(e.key==="ArrowRight")rightHeld=true;if(e.key==="Escape")togglePause();if(e.key==="Enter"&&!running)start()});addEventListener("keyup",e=>{if(e.key==="ArrowLeft")leftHeld=false;if(e.key==="ArrowRight")rightHeld=false});
+$("startBtn").onclick=start;$("againBtn").onclick=start;$("pauseBtn").onclick=togglePause;$("resumeBtn").onclick=togglePause;if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("service-worker.js").catch(()=>{}));$("best").textContent=best;hud();loop();
 })();
 </script>
-</body>
-</html>
+</body></html>
