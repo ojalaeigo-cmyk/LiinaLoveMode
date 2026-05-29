@@ -1,8 +1,8 @@
 {
-  "name": "Star King Love Mode",
-  "short_name": "Star King",
-  "description": "Star King Love Mode: only yellow stars, no bad objects.",
-  "start_url": "./?lovemode=1",
+  "name": "LOVE Liina",
+  "short_name": "LOVE Liina",
+  "description": "LOVE Liina: armas tähtede püüdmise mäng.",
+  "start_url": "./?loveliina=1",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",

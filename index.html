@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="et">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Star King - Love Mode</title>
+<title>LOVE Liina</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#071018">
 <style>
@@ -27,63 +27,67 @@ button{border:0;border-radius:999px;padding:15px 28px;font-size:18px;font-weight
 <body>
 <div id="wrap"><canvas id="game"></canvas></div>
 <div id="hud">
-  <div class="box">Score<br><span id="score" class="yellow">0</span></div>
-  <div class="box">Stars<br><span id="stars" class="green">0</span></div>
-  <div class="box">Best<br><span id="best" class="pink">0</span></div>
+  <div class="box">Punktid<br><span id="score" class="yellow">0</span></div>
+  <div class="box">Tähed<br><span id="stars" class="green">0</span></div>
+  <div class="box">Parim<br><span id="best" class="pink">0</span></div>
 </div>
-<div id="level"><div id="lvlName">Love Mode</div><div class="bar"><div id="prog"></div></div></div>
+<div id="level"><div id="lvlName">LOVE Liina</div><div class="bar"><div id="prog"></div></div></div>
 <button id="pauseBtn">⏸</button>
 
 <div id="start" class="screen">
   <div class="panel">
-    <h1>Star King</h1>
-    <p><b>Love Mode.</b> Siin ei ole ühtegi punast ega halba asja.</p>
+    <h1>LOVE Liina</h1>
+    <p><b>Armas tähemäng.</b> Ainult kollased tähed. Ühtegi punast ega halba asja ei ole.</p>
     <div class="legend">
-      <div>⭐ Püüad ainult kollaseid tähti.</div>
-      <div>🎁 Iga 50 püütud tähe järel saad automaatselt +500 punkti.</div>
-      <div>💛 Iga 1 000 000 punkti järel ilmub tekst: <b>Armastand sind kallis</b></div>
-      <div>✨ Mäng on lollakas, rahulik ja täiesti positiivne.</div>
+      <div>⭐ Iga täht annab +10 punkti.</div>
+      <div>🎁 Iga 50 püütud tähte annab automaatselt +5000 punkti.</div>
+      <div>💛 Iga 100 püütud tähte näitab: <b>Armastand sind kallis</b></div>
+      <div>✨ Iga 500 püütud tähte näitab: <b>Sa oled mu täht</b></div>
     </div>
     <p id="screenWakeMarker" class="small" style="color:#8cffb1;font-weight:bold">SCREEN ALWAYS ON MODE</p>
-    <p id="wakeStatus" class="small" style="color:#ffd966">Screen lock: waiting for Start</p>
-    <button id="startBtn">Start</button>
+    <p id="wakeStatus" class="small" style="color:#ffd966">Ekraanilukk: ootab alustamist</p>
+    <button id="startBtn">Alusta</button>
   </div>
 </div>
 
-<div id="pauseScreen" class="screen hidden"><div class="panel"><h1>Pause</h1><p>Game is paused.</p><button id="resumeBtn">Resume</button></div></div>
-<div id="over" class="screen hidden"><div class="panel"><h1>Game over</h1><p>Score: <b><span id="finalScore">0</span></b></p><p>Stars: <b><span id="finalStars">0</span></b></p><button id="againBtn">Play again</button></div></div>
+<div id="pauseScreen" class="screen hidden"><div class="panel"><h1>Paus</h1><p>Mäng on peatatud.</p><button id="resumeBtn">Jätka</button></div></div>
+<div id="over" class="screen hidden"><div class="panel"><h1>Mäng läbi</h1><p>Punktid: <b><span id="finalScore">0</span></b></p><p>Tähed: <b><span id="finalStars">0</span></b></p><button id="againBtn">Mängi uuesti</button></div></div>
 
 <script>
 (function(){
 "use strict";
 const canvas=document.getElementById("game"),ctx=canvas.getContext("2d"),$=id=>document.getElementById(id);
 let W=360,H=640,S=1,frame=0,running=false,paused=false;
-let score=0,stars=0,best=Number(localStorage.getItem("sk_love_best")||0);
-let items=[],parts=[],texts=[],spawnT=0,nextLoveText=1000000;
+let score=0,stars=0,best=Number(localStorage.getItem("love_liina_best")||0);
+let items=[],parts=[],texts=[],spawnT=0;
 let tilt=0,hasTilt=false,touch=false;
 let player={x:180,y:560,w:68,h:32,targetX:180,color:"#2e9fdb"};
-
 let wakeLock=null,wakeTimer=null,keepVid=null,keepCan=null,keepCtx=null,keepFrame=0;
+
 function wakeStatus(t){let e=$("wakeStatus");if(e)e.textContent=t}
-async function wake(){try{fallback();if("wakeLock"in navigator){wakeLock=await navigator.wakeLock.request("screen");wakeStatus("Screen lock: active while playing");if(wakeLock.addEventListener)wakeLock.addEventListener("release",()=>{wakeLock=null;if(running)setTimeout(wake,500)});return}}catch(e){}wakeStatus("Screen lock: fallback mode active")}
+async function wake(){try{fallback();if("wakeLock"in navigator){wakeLock=await navigator.wakeLock.request("screen");wakeStatus("Ekraanilukk: aktiivne mängimise ajal");if(wakeLock.addEventListener)wakeLock.addEventListener("release",()=>{wakeLock=null;if(running)setTimeout(wake,500)});return}}catch(e){}wakeStatus("Ekraanilukk: varurežiim aktiivne")}
 function fallback(){try{if(keepVid)return;keepCan=document.createElement("canvas");keepCan.width=2;keepCan.height=2;keepCan.style.cssText="position:fixed;left:-20px;top:-20px;width:1px;height:1px;opacity:0";document.body.appendChild(keepCan);keepCtx=keepCan.getContext("2d");keepVid=document.createElement("video");keepVid.muted=true;keepVid.loop=true;keepVid.autoplay=true;keepVid.setAttribute("playsinline","");keepVid.style.cssText=keepCan.style.cssText;document.body.appendChild(keepVid);let st=keepCan.captureStream?keepCan.captureStream(1):null;if(st){keepVid.srcObject=st;keepVid.play().catch(()=>{})}function tick(){if(!running)return;keepFrame++;if(keepCtx){keepCtx.fillStyle=keepFrame%2?"#000":"#111";keepCtx.fillRect(0,0,2,2)}setTimeout(tick,1000)}tick()}catch(e){}}
 function startWake(){wake();if(wakeTimer)clearInterval(wakeTimer);wakeTimer=setInterval(()=>{if(running)wake()},4000)}
-async function stopWake(){if(wakeTimer)clearInterval(wakeTimer);wakeTimer=null;try{if(wakeLock)await wakeLock.release()}catch(e){}wakeLock=null;if(keepVid){keepVid.pause();keepVid.remove();keepVid=null}if(keepCan){keepCan.remove();keepCan=null}wakeStatus("Screen lock: inactive")}
+async function stopWake(){if(wakeTimer)clearInterval(wakeTimer);wakeTimer=null;try{if(wakeLock)await wakeLock.release()}catch(e){}wakeLock=null;if(keepVid){keepVid.pause();keepVid.remove();keepVid=null}if(keepCan){keepCan.remove();keepCan=null}wakeStatus("Ekraanilukk: mitteaktiivne")}
 
 function resize(){let cw=Math.min(innerWidth,520),ch=innerHeight;canvas.width=cw;canvas.height=ch;canvas.style.width=cw+"px";canvas.style.height=ch+"px";W=cw;H=ch;S=W/360;player.y=H-92}addEventListener("resize",resize);resize();
-function rand(a,b){return Math.random()*(b-a)+a}
-function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function rand(a,b){return Math.random()*(b-a)+a}function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function addText(x,y,t,b=false){texts.push({x,y,t,life:b?150:55,b})}
 function boom(x,y){for(let i=0;i<18;i++)parts.push({x,y,vx:rand(-2.8,2.8)*S,vy:rand(-2.8,2.8)*S,r:rand(2,4)*S,life:26})}
-function hud(){$("score").textContent=score;$("stars").textContent=stars;$("best").textContent=best;$("prog").style.width=((stars%50)/50*100)+"%";$("lvlName").textContent="Love Mode — järgmine +500 boonus: "+(50-stars%50)+" tähte";}
-function start(){score=0;stars=0;nextLoveText=1000000;items=[];parts=[];texts=[];spawnT=0;player.x=W/2;player.targetX=W/2;running=true;paused=false;$("start").classList.add("hidden");$("over").classList.add("hidden");$("pauseScreen").classList.add("hidden");$("pauseBtn").classList.add("visible");startWake();hud()}
-function gameOver(){stopWake();running=false;if(score>best){best=score;localStorage.setItem("sk_love_best",best)}$("finalScore").textContent=score;$("finalStars").textContent=stars;$("pauseBtn").classList.remove("visible");$("over").classList.remove("hidden")}
+function hud(){$("score").textContent=score;$("stars").textContent=stars;$("best").textContent=best;$("prog").style.width=((stars%50)/50*100)+"%";$("lvlName").textContent="LOVE Liina — järgmine +5000 boonus: "+(50-stars%50)+" tähte";}
+function start(){score=0;stars=0;items=[];parts=[];texts=[];spawnT=0;player.x=W/2;player.targetX=W/2;running=true;paused=false;$("start").classList.add("hidden");$("over").classList.add("hidden");$("pauseScreen").classList.add("hidden");$("pauseBtn").classList.add("visible");startWake();hud()}
+function gameOver(){stopWake();running=false;if(score>best){best=score;localStorage.setItem("love_liina_best",best)}$("finalScore").textContent=score;$("finalStars").textContent=stars;$("pauseBtn").classList.remove("visible");$("over").classList.remove("hidden")}
 function togglePause(){if(!running)return;paused=!paused;if(!paused)startWake();$("pauseScreen").classList.toggle("hidden",!paused);$("pauseBtn").textContent=paused?"▶":"⏸"}
 
-function spawn(){items.push({x:rand(28*S,W-28*S),y:-35*S,r:12*S,vy:(1.8+rand(0,.65))*S,spin:rand(0,6.28)})}
-function collect(i){stars++;score+=10;boom(i.x,i.y);addText(i.x,i.y,"+10");
-  if(stars%50===0){score+=500;addText(W/2,H*.30,"+500 LOVE BONUS",true)}
-  while(score>=nextLoveText){addText(W/2,H*.42,"Armastand sind kallis",true);nextLoveText+=1000000}
+function spawn(){items.push({x:rand(28*S,W-28*S),y:-35*S,r:12*S,vy:(1.75+Math.min(1.2,stars/700)+rand(0,.55))*S,spin:rand(0,6.28)})}
+function collect(i){
+  stars++;
+  score+=10;
+  boom(i.x,i.y);
+  addText(i.x,i.y,"+10");
+  if(stars%50===0){score+=5000;addText(W/2,H*.30,"+5000 LOVE BONUS",true)}
+  if(stars%100===0){addText(W/2,H*.42,"Armastand sind kallis",true)}
+  if(stars%500===0){addText(W/2,H*.50,"Sa oled mu täht",true)}
 }
 function hit(c,r){let x=clamp(c.x,r.x-r.w/2,r.x+r.w/2),y=clamp(c.y,r.y-r.h/2,r.y+r.h/2),dx=c.x-x,dy=c.y-y;return dx*dx+dy*dy<c.r*c.r}
 
@@ -91,7 +95,7 @@ function update(){if(!running||paused)return;
   if(hasTilt&&!touch)player.targetX=W/2+tilt*(W*.42);
   let min=player.w*S/2,max=W-player.w*S/2;player.targetX=clamp(player.targetX,min,max);
   let dx=player.targetX-player.x;player.x+=clamp(dx*.18,-8*S,8*S);player.x=clamp(player.x,min,max);
-  spawnT++;if(spawnT>30){spawnT=0;spawn()}
+  spawnT++;if(spawnT>Math.max(18,30-Math.floor(stars/120))){spawnT=0;spawn()}
   for(let i of items){i.y+=i.vy;i.spin+=.06}
   let box={x:player.x,y:player.y,w:player.w*S,h:player.h*S};
   for(let i of items)if(!i.dead&&hit(i,box)){i.dead=true;collect(i)}
@@ -100,16 +104,10 @@ function update(){if(!running||paused)return;
   for(let t of texts){t.y-=.25*S;t.life--}texts=texts.filter(t=>t.life>0);
   hud();
 }
-
 function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath()}
 function bg(){let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,"#1b3d5d");g.addColorStop(1,"#071018");ctx.fillStyle=g;ctx.fillRect(0,0,W,H);for(let i=0;i<34;i++){ctx.fillStyle=i%4?"rgba(255,255,255,.09)":"rgba(255,217,102,.22)";ctx.beginPath();ctx.arc((i*73+frame*.13)%W,60+(i*89)%Math.max(120,H-140),1.5+i%3,0,6.28);ctx.fill()}}
 function star(x,y,r,rot,c="#ffd966"){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.shadowBlur=14*S;ctx.shadowColor=c;ctx.fillStyle=c;ctx.beginPath();for(let i=0;i<10;i++){let a=i*Math.PI/5-Math.PI/2,rrr=i%2?r*.45:r;ctx.lineTo(Math.cos(a)*rrr,Math.sin(a)*rrr)}ctx.closePath();ctx.fill();ctx.restore()}
-function draw(){ctx.clearRect(0,0,W,H);bg();
-  for(let i of items)star(i.x,i.y,i.r,i.spin);
-  for(let p of parts){ctx.globalAlpha=p.life/26;ctx.fillStyle="#ffd966";ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.28);ctx.fill();ctx.globalAlpha=1}
-  let w=player.w*S,h=player.h*S;ctx.save();ctx.translate(player.x,player.y);ctx.fillStyle="rgba(0,0,0,.35)";ctx.beginPath();ctx.ellipse(0,h*.55,w*.6,h*.22,0,0,6.28);ctx.fill();ctx.fillStyle=player.color;rr(-w/2,-h/2,w,h,14*S);ctx.fill();ctx.fillStyle="rgba(255,255,255,.46)";rr(-w*.32,-h*.38,w*.64,h*.30,9*S);ctx.fill();ctx.restore();
-  for(let t of texts){ctx.globalAlpha=Math.min(1,t.life/20);ctx.fillStyle=t.b?"#ffd966":"#fff";ctx.font=`bold ${(t.b?24:15)*S}px Arial`;ctx.textAlign="center";ctx.fillText(t.t,t.x,t.y);ctx.globalAlpha=1}
-}
+function draw(){ctx.clearRect(0,0,W,H);bg();for(let i of items)star(i.x,i.y,i.r,i.spin);for(let p of parts){ctx.globalAlpha=p.life/26;ctx.fillStyle="#ffd966";ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.28);ctx.fill();ctx.globalAlpha=1}let w=player.w*S,h=player.h*S;ctx.save();ctx.translate(player.x,player.y);ctx.fillStyle="rgba(0,0,0,.35)";ctx.beginPath();ctx.ellipse(0,h*.55,w*.6,h*.22,0,0,6.28);ctx.fill();ctx.fillStyle=player.color;rr(-w/2,-h/2,w,h,14*S);ctx.fill();ctx.fillStyle="rgba(255,255,255,.46)";rr(-w*.32,-h*.38,w*.64,h*.30,9*S);ctx.fill();ctx.restore();for(let t of texts){ctx.globalAlpha=Math.min(1,t.life/20);ctx.fillStyle=t.b?"#ffd966":"#fff";ctx.font=`bold ${(t.b?24:15)*S}px Arial`;ctx.textAlign="center";ctx.fillText(t.t,t.x,t.y);ctx.globalAlpha=1}}
 function loop(){frame++;update();draw();requestAnimationFrame(loop)}
 
 canvas.addEventListener("touchstart",e=>{e.preventDefault();touch=true;player.targetX=e.touches[0].clientX-(innerWidth-W)/2},{passive:false});
