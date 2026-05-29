@@ -1,3 +1,10 @@
 Lae need failid LiinaLoveMode repo juurkausta.
 Ava pärast:
-https://ojalaeigo-cmyk.github.io/LiinaLoveMode/?fixedcontrols=1
+https://ojalaeigo-cmyk.github.io/LiinaLoveMode/?level5heartboss=1
+
+Muudatused:
+- max level 5
+- leveli lõpus tuleb süda ja laev muudab kuju
+- iga 1000 punkti tagant tuleb koll
+- kolli saab tulistada
+- kolli hävitamine annab relva juurde
