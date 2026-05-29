@@ -1,12 +1,12 @@
 Lae need failid LiinaLoveMode repo juurkausta.
 
 Ava pärast:
-https://ojalaeigo-cmyk.github.io/LiinaLoveMode/?boss5x_hearts2x=1
+https://ojalaeigo-cmyk.github.io/LiinaLoveMode/?boss40x_redheart=1
 
 Muudatused:
-- koll kestab 5x kauem;
-- südamed tulevad 2x tihemini;
-- max level on endiselt 5;
+- koll on nüüd 40x tugevam;
+- viienda leveli lõpus ilmub suur punane süda;
+- max level on 5;
 - südame võtmine muudab laeva kuju;
 - kolli saab tulistada;
 - kolli hävitamine annab relva tugevust juurde.

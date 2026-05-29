@@ -40,11 +40,12 @@ button{border:0;border-radius:999px;padding:15px 28px;font-size:18px;font-weight
 <div class="legend">
 <div>⭐ Ainult kollased tähed. Punaseid asju ei ole.</div>
 <div>💛 Südamed tulevad nüüd 2x tihemini. Süda muudab sinu laeva kuju.</div>
-<div>👾 Iga 1000 punkti tagant tuleb koll. Koll kestab nüüd 5x kauem ja tema pihta saab tulistada.</div>
+<div>👾 Iga 1000 punkti tagant tuleb koll. Koll on nüüd 40x tugevam ja tema pihta saab tulistada.</div>
 <div>🔫 Kolli hävitamine annab relva tugevust juurde.</div>
-<div>✨ Kokku on 5 levelit. Pärast 5. levelit mäng jätkub rekordi peale.</div>
+<div>❤️ Kui viies level lõpuni jõuab, ilmub suur punane süda.</div>
 </div>
 <p class="small" style="color:#8cffb1;font-weight:bold">VERSION: BOSS 5X LONGER · HEARTS 2X MORE OFTEN</p>
+<p class="small" style="color:#ff8cc6;font-weight:bold">VERSION: BOSS 40X STRONGER · RED HEART AT LEVEL 5 END</p>
 <p id="wakeStatus" class="small" style="color:#ffd966">Ekraanilukk: ootab alustamist</p>
 <button id="startBtn">Alusta</button>
 </div></div>
@@ -57,7 +58,7 @@ button{border:0;border-radius:999px;padding:15px 28px;font-size:18px;font-weight
 const c=document.getElementById("game"),x=c.getContext("2d"),$=id=>document.getElementById(id);
 let W=360,H=640,S=1,left=0,frame=0,running=false,paused=false;
 let score=0,best=+(localStorage.love_liina_lvl5_best||0),stars=0,level=1,levelScore=0,nextHeartScore=500,nextBossScore=1000;
-let weapon=0,shipShape=0,items=[],hearts=[],boss=null,bullets=[],parts=[],texts=[],spawnT=0,fireT=0;
+let weapon=0,shipShape=0,items=[],hearts=[],boss=null,bullets=[],parts=[],texts=[],spawnT=0,fireT=0,redEndHeart=null;
 let touch=false,leftHeld=false,rightHeld=false,fireHeld=false,tilt=0,hasTilt=false;
 let p={x:180,y:560,w:74,h:34,targetX:180,color:"#2e9fdb"};
 let wakeLock=null,wakeTimer=null,vid=null,can=null,ctx2=null,kf=0;
@@ -70,17 +71,22 @@ function fallback(){try{if(vid)return;can=document.createElement("canvas");can.w
 function startWake(){wake();clearInterval(wakeTimer);wakeTimer=setInterval(()=>{if(running)wake()},4000)}
 async function stopWake(){clearInterval(wakeTimer);wakeTimer=null;try{if(wakeLock)await wakeLock.release()}catch(e){}if(vid){vid.pause();vid.remove();vid=null}if(can){can.remove();can=null}ws("Ekraanilukk: mitteaktiivne")}
 function hud(){$("score").textContent=score;$("levelNum").textContent=level+"/5";$("weapon").textContent=weapon;let pct=level<5?clamp((score-levelScore)/(nextHeartScore-levelScore)*100,0,100):100;$("prog").style.width=pct+"%";$("label").textContent=boss?"KOLL — tulista!":("LOVE Liina — level "+level+" / 5")}
-function start(){score=0;stars=0;level=1;levelScore=0;nextHeartScore=250;nextBossScore=1000;weapon=0;shipShape=0;items=[];hearts=[];boss=null;bullets=[];parts=[];texts=[];spawnT=0;p.x=W/2;p.targetX=W/2;running=true;paused=false;$("start").classList.add("hidden");$("over").classList.add("hidden");$("pauseScreen").classList.add("hidden");$("pauseBtn").classList.add("visible");$("controls").classList.add("gridvisible");startWake();hud()}
+function start(){score=0;stars=0;level=1;levelScore=0;nextHeartScore=250;nextBossScore=1000;weapon=0;shipShape=0;items=[];hearts=[];boss=null;bullets=[];parts=[];texts=[];spawnT=0;redEndHeart=null;p.x=W/2;p.targetX=W/2;running=true;paused=false;$("start").classList.add("hidden");$("over").classList.add("hidden");$("pauseScreen").classList.add("hidden");$("pauseBtn").classList.add("visible");$("controls").classList.add("gridvisible");startWake();hud()}
 function gameOver(){stopWake();running=false;if(score>best){best=score;localStorage.love_liina_lvl5_best=best}$("finalScore").textContent=score;$("finalLevel").textContent=level+"/5";$("pauseBtn").classList.remove("visible");$("controls").classList.remove("gridvisible");$("over").classList.remove("hidden")}
 function togglePause(){if(!running)return;paused=!paused;if(!paused)startWake();$("pauseScreen").classList.toggle("hidden",!paused);$("pauseBtn").textContent=paused?"▶":"⏸"}
 function addText(px,py,t,b=false){texts.push({x:px,y:py,t,life:b?130:55,b})}
 function boom(px,py,g=true){for(let i=0;i<18;i++)parts.push({x:px,y:py,vx:rand(-2.8,2.8)*S,vy:rand(-2.8,2.8)*S,r:rand(2,4)*S,life:26,g})}
 function spawnStar(){items.push({x:rand(28*S,W-28*S),y:-35*S,r:12*S,vy:(1.75+Math.min(1.1,score/7000)+rand(0,.55))*S,spin:rand(0,6.28)})}
 function spawnHeart(){hearts.push({x:W/2,y:-44*S,r:24*S,vy:2.2*S,spin:0})}
-function spawnBoss(){boss={x:W/2,y:105*S,r:35*S,hp:25+weapon*10,t:0,max:25+weapon*10};addText(W/2,H*.30,"KOLL TULI!",true)}
+function spawnBoss(){boss={x:W/2,y:105*S,r:35*S,hp:200+weapon*80,t:0,max:200+weapon*80};addText(W/2,H*.30,"KOLL TULI!",true)}
 function shoot(){if(!boss)return;let count=Math.max(1,weapon);for(let i=0;i<count;i++){let off=(i-(count-1)/2)*10*S;bullets.push({x:p.x+off,y:p.y-22*S,vy:-7*S,r:4*S})}}
 function collectStar(i){stars++;score+=10;boom(i.x,i.y);addText(i.x,i.y,"+10");if(stars%50===0){score+=5000;addText(W/2,H*.30,"+5000 LOVE BONUS",true)}if(stars%100===0)addText(W/2,H*.42,"Armastand sind kallis",true);if(score>=nextHeartScore && level<5 && hearts.length===0){spawnHeart();nextHeartScore=99999999}if(score>=nextBossScore && !boss){spawnBoss();nextBossScore+=1000}}
-function collectHeart(h){shipShape=(shipShape+1)%4;p.color=["#2e9fdb","#ff8cc6","#8cffb1","#ffd966"][shipShape];weapon=Math.max(1,weapon);addText(W/2,H*.32,"💛 LAEV MUUTUS",true);boom(h.x,h.y,true);if(level<5){level++;levelScore=score;nextHeartScore=score+250+level*125;addText(W/2,H*.42,"LEVEL "+level,true)}else addText(W/2,H*.42,"MAX LEVEL",true)}
+function showRedEndHeart(){
+  redEndHeart={x:W/2,y:H*.38,r:62*S,life:999999};
+  addText(W/2,H*.54,"❤️ LOVE LIINA",true);
+  addText(W/2,H*.62,"Sa jõudsid lõpuni",true);
+}
+function collectHeart(h){shipShape=(shipShape+1)%4;p.color=["#2e9fdb","#ff8cc6","#8cffb1","#ffd966"][shipShape];weapon=Math.max(1,weapon);addText(W/2,H*.32,"💛 LAEV MUUTUS",true);boom(h.x,h.y,true);if(level<5){level++;levelScore=score;nextHeartScore=score+250+level*125;addText(W/2,H*.42,"LEVEL "+level,true)}else{addText(W/2,H*.42,"MAX LEVEL",true);showRedEndHeart();}}
 function hitCircleRect(o){let rx=p.x-p.w*S/2,ry=p.y-p.h*S/2,rw=p.w*S,rh=p.h*S;let hx=clamp(o.x,rx,rx+rw),hy=clamp(o.y,ry,ry+rh),dx=o.x-hx,dy=o.y-hy;return dx*dx+dy*dy<o.r*o.r}
 function update(){if(!running||paused)return;
  if(leftHeld)p.targetX-=10*S;if(rightHeld)p.targetX+=10*S;if(hasTilt&&!touch&&!leftHeld&&!rightHeld)p.targetX=W/2+tilt*(W*.42);p.targetX=clamp(p.targetX,p.w*S/2,W-p.w*S/2);p.x+=clamp((p.targetX-p.x)*.24,-12*S,12*S);
@@ -91,13 +97,23 @@ function update(){if(!running||paused)return;
  for(const b of bullets){b.y+=b.vy;if(boss){let dx=b.x-boss.x,dy=b.y-boss.y;if(dx*dx+dy*dy<(boss.r+b.r)*(boss.r+b.r)){b.dead=true;boss.hp--;boom(b.x,b.y,true);if(boss.hp<=0){addText(W/2,H*.30,"RELVA JÕUD +1",true);weapon++;score+=250;boom(boss.x,boss.y,true);boss=null}}}}
  if(boss){boss.t++;boss.x=W/2+Math.sin(boss.t*.035)*W*.28}
  items=items.filter(i=>!i.dead&&i.y<H+70);hearts=hearts.filter(h=>!h.dead&&h.y<H+70);bullets=bullets.filter(b=>!b.dead&&b.y>-30);
- for(const q of parts){q.x+=q.vx;q.y+=q.vy;q.life--}parts=parts.filter(q=>q.life>0);for(const t of texts){t.y-=.25*S;t.life--}texts=texts.filter(t=>t.life>0);hud()}
+ if(redEndHeart){redEndHeart.r=(62+Math.sin(frame*.08)*5)*S;}for(const q of parts){q.x+=q.vx;q.y+=q.vy;q.life--}parts=parts.filter(q=>q.life>0);for(const t of texts){t.y-=.25*S;t.life--}texts=texts.filter(t=>t.life>0);hud()}
 function rr(a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.lineTo(a+w-r,b);x.quadraticCurveTo(a+w,b,a+w,b+r);x.lineTo(a+w,b+h-r);x.quadraticCurveTo(a+w,b+h,a+w-r,b+h);x.lineTo(a+r,b+h);x.quadraticCurveTo(a,b+h,a,b+h-r);x.lineTo(a,b+r);x.quadraticCurveTo(a,b,a+r,b);x.closePath()}
 function bg(){let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,"#1b3d5d");g.addColorStop(1,"#071018");x.fillStyle=g;x.fillRect(0,0,W,H);for(let i=0;i<34;i++){x.fillStyle=i%4?"rgba(255,255,255,.09)":"rgba(255,217,102,.22)";x.beginPath();x.arc((i*73+frame*.13)%W,60+(i*89)%Math.max(120,H-140),1.5+i%3,0,6.28);x.fill()}}
 function star(px,py,r,rot){x.save();x.translate(px,py);x.rotate(rot);x.shadowBlur=14*S;x.shadowColor="#ffd966";x.fillStyle="#ffd966";x.beginPath();for(let i=0;i<10;i++){let a=i*Math.PI/5-Math.PI/2,rr=i%2?r*.45:r;x.lineTo(Math.cos(a)*rr,Math.sin(a)*rr)}x.closePath();x.fill();x.restore()}
 function drawHeart(h){x.save();x.translate(h.x,h.y);x.rotate(Math.sin(frame*.03)*.12);x.font=`${h.r*1.8}px Arial`;x.textAlign="center";x.textBaseline="middle";x.shadowBlur=15*S;x.shadowColor="#ff8cc6";x.fillText("💛",0,0);x.restore()}
 function drawShip(){let w=p.w*S,h=p.h*S;x.save();x.translate(p.x,p.y);x.fillStyle="rgba(0,0,0,.35)";x.beginPath();x.ellipse(0,h*.55,w*.6,h*.22,0,0,6.28);x.fill();x.fillStyle=p.color;if(shipShape===0){rr(-w/2,-h/2,w,h,14*S);x.fill()}else if(shipShape===1){x.beginPath();x.moveTo(0,-h*.7);x.lineTo(w*.55,h*.45);x.lineTo(0,h*.22);x.lineTo(-w*.55,h*.45);x.closePath();x.fill()}else if(shipShape===2){x.beginPath();x.arc(0,0,w*.42,0,6.28);x.fill();}else{x.beginPath();x.moveTo(0,-h*.65);x.lineTo(w*.55,0);x.lineTo(w*.25,h*.5);x.lineTo(-w*.25,h*.5);x.lineTo(-w*.55,0);x.closePath();x.fill()}x.restore()}
-function draw(){x.clearRect(0,0,W,H);bg();for(const i of items)star(i.x,i.y,i.r,i.spin);for(const h of hearts)drawHeart(h);if(boss){x.save();x.translate(boss.x,boss.y);x.shadowBlur=18*S;x.shadowColor="#ff8cc6";x.fillStyle="#6b1b8f";x.beginPath();x.arc(0,0,boss.r,0,6.28);x.fill();x.fillStyle="#fff";x.font=`bold ${18*S}px Arial`;x.textAlign="center";x.textBaseline="middle";x.fillText("👾 "+boss.hp,0,0);x.restore()}for(const b of bullets){x.fillStyle="#ffd966";x.beginPath();x.arc(b.x,b.y,b.r,0,6.28);x.fill()}for(const q of parts){x.globalAlpha=q.life/26;x.fillStyle=q.g?"#ffd966":"#ff8cc6";x.beginPath();x.arc(q.x,q.y,q.r,0,6.28);x.fill();x.globalAlpha=1}drawShip();for(const t of texts){x.globalAlpha=Math.min(1,t.life/20);x.fillStyle=t.b?"#ffd966":"#fff";x.font=`bold ${(t.b?24:15)*S}px Arial`;x.textAlign="center";x.fillText(t.t,t.x,t.y);x.globalAlpha=1}}
+function draw(){x.clearRect(0,0,W,H);bg();for(const i of items)star(i.x,i.y,i.r,i.spin);for(const h of hearts)drawHeart(h);if(boss){x.save();x.translate(boss.x,boss.y);x.shadowBlur=18*S;x.shadowColor="#ff8cc6";x.fillStyle="#6b1b8f";x.beginPath();x.arc(0,0,boss.r,0,6.28);x.fill();x.fillStyle="#fff";x.font=`bold ${18*S}px Arial`;x.textAlign="center";x.textBaseline="middle";x.fillText("👾 "+boss.hp,0,0);x.restore()}for(const b of bullets){x.fillStyle="#ffd966";x.beginPath();x.arc(b.x,b.y,b.r,0,6.28);x.fill()}for(const q of parts){x.globalAlpha=q.life/26;x.fillStyle=q.g?"#ffd966":"#ff8cc6";x.beginPath();x.arc(q.x,q.y,q.r,0,6.28);x.fill();x.globalAlpha=1}if(redEndHeart){
+  x.save();
+  x.translate(redEndHeart.x,redEndHeart.y);
+  x.shadowBlur=28*S;
+  x.shadowColor="#ff2d55";
+  x.font=`${redEndHeart.r*1.7}px Arial`;
+  x.textAlign="center";
+  x.textBaseline="middle";
+  x.fillText("❤️",0,0);
+  x.restore();
+}drawShip();for(const t of texts){x.globalAlpha=Math.min(1,t.life/20);x.fillStyle=t.b?"#ffd966":"#fff";x.font=`bold ${(t.b?24:15)*S}px Arial`;x.textAlign="center";x.fillText(t.t,t.x,t.y);x.globalAlpha=1}}
 function loop(){frame++;update();draw();requestAnimationFrame(loop)}
 function ptr(e){let xx=e.clientX;if(e.touches&&e.touches[0])xx=e.touches[0].clientX;p.targetX=sx(xx)}
 c.addEventListener("touchstart",e=>{e.preventDefault();touch=true;ptr(e)},{passive:false});c.addEventListener("touchmove",e=>{e.preventDefault();touch=true;ptr(e)},{passive:false});c.addEventListener("touchend",e=>{e.preventDefault();touch=false},{passive:false});
