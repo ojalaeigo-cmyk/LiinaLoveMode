@@ -39,11 +39,12 @@ button{border:0;border-radius:999px;padding:15px 28px;font-size:18px;font-weight
 <p><b>Level 5 versioon.</b> Püüa kollaseid tähti, võta leveli lõpus süda ja tulista kolle.</p>
 <div class="legend">
 <div>⭐ Ainult kollased tähed. Punaseid asju ei ole.</div>
-<div>💛 Leveli lõpus tuleb süda. Süda muudab sinu laeva kuju.</div>
-<div>👾 Iga 1000 punkti tagant tuleb koll. Kolli pihta saab tulistada.</div>
+<div>💛 Südamed tulevad nüüd 2x tihemini. Süda muudab sinu laeva kuju.</div>
+<div>👾 Iga 1000 punkti tagant tuleb koll. Koll kestab nüüd 5x kauem ja tema pihta saab tulistada.</div>
 <div>🔫 Kolli hävitamine annab relva tugevust juurde.</div>
 <div>✨ Kokku on 5 levelit. Pärast 5. levelit mäng jätkub rekordi peale.</div>
 </div>
+<p class="small" style="color:#8cffb1;font-weight:bold">VERSION: BOSS 5X LONGER · HEARTS 2X MORE OFTEN</p>
 <p id="wakeStatus" class="small" style="color:#ffd966">Ekraanilukk: ootab alustamist</p>
 <button id="startBtn">Alusta</button>
 </div></div>
@@ -69,17 +70,17 @@ function fallback(){try{if(vid)return;can=document.createElement("canvas");can.w
 function startWake(){wake();clearInterval(wakeTimer);wakeTimer=setInterval(()=>{if(running)wake()},4000)}
 async function stopWake(){clearInterval(wakeTimer);wakeTimer=null;try{if(wakeLock)await wakeLock.release()}catch(e){}if(vid){vid.pause();vid.remove();vid=null}if(can){can.remove();can=null}ws("Ekraanilukk: mitteaktiivne")}
 function hud(){$("score").textContent=score;$("levelNum").textContent=level+"/5";$("weapon").textContent=weapon;let pct=level<5?clamp((score-levelScore)/(nextHeartScore-levelScore)*100,0,100):100;$("prog").style.width=pct+"%";$("label").textContent=boss?"KOLL — tulista!":("LOVE Liina — level "+level+" / 5")}
-function start(){score=0;stars=0;level=1;levelScore=0;nextHeartScore=500;nextBossScore=1000;weapon=0;shipShape=0;items=[];hearts=[];boss=null;bullets=[];parts=[];texts=[];spawnT=0;p.x=W/2;p.targetX=W/2;running=true;paused=false;$("start").classList.add("hidden");$("over").classList.add("hidden");$("pauseScreen").classList.add("hidden");$("pauseBtn").classList.add("visible");$("controls").classList.add("gridvisible");startWake();hud()}
+function start(){score=0;stars=0;level=1;levelScore=0;nextHeartScore=250;nextBossScore=1000;weapon=0;shipShape=0;items=[];hearts=[];boss=null;bullets=[];parts=[];texts=[];spawnT=0;p.x=W/2;p.targetX=W/2;running=true;paused=false;$("start").classList.add("hidden");$("over").classList.add("hidden");$("pauseScreen").classList.add("hidden");$("pauseBtn").classList.add("visible");$("controls").classList.add("gridvisible");startWake();hud()}
 function gameOver(){stopWake();running=false;if(score>best){best=score;localStorage.love_liina_lvl5_best=best}$("finalScore").textContent=score;$("finalLevel").textContent=level+"/5";$("pauseBtn").classList.remove("visible");$("controls").classList.remove("gridvisible");$("over").classList.remove("hidden")}
 function togglePause(){if(!running)return;paused=!paused;if(!paused)startWake();$("pauseScreen").classList.toggle("hidden",!paused);$("pauseBtn").textContent=paused?"▶":"⏸"}
 function addText(px,py,t,b=false){texts.push({x:px,y:py,t,life:b?130:55,b})}
 function boom(px,py,g=true){for(let i=0;i<18;i++)parts.push({x:px,y:py,vx:rand(-2.8,2.8)*S,vy:rand(-2.8,2.8)*S,r:rand(2,4)*S,life:26,g})}
 function spawnStar(){items.push({x:rand(28*S,W-28*S),y:-35*S,r:12*S,vy:(1.75+Math.min(1.1,score/7000)+rand(0,.55))*S,spin:rand(0,6.28)})}
 function spawnHeart(){hearts.push({x:W/2,y:-44*S,r:24*S,vy:2.2*S,spin:0})}
-function spawnBoss(){boss={x:W/2,y:105*S,r:35*S,hp:5+weapon*2,t:0,max:5+weapon*2};addText(W/2,H*.30,"KOLL TULI!",true)}
+function spawnBoss(){boss={x:W/2,y:105*S,r:35*S,hp:25+weapon*10,t:0,max:25+weapon*10};addText(W/2,H*.30,"KOLL TULI!",true)}
 function shoot(){if(!boss)return;let count=Math.max(1,weapon);for(let i=0;i<count;i++){let off=(i-(count-1)/2)*10*S;bullets.push({x:p.x+off,y:p.y-22*S,vy:-7*S,r:4*S})}}
 function collectStar(i){stars++;score+=10;boom(i.x,i.y);addText(i.x,i.y,"+10");if(stars%50===0){score+=5000;addText(W/2,H*.30,"+5000 LOVE BONUS",true)}if(stars%100===0)addText(W/2,H*.42,"Armastand sind kallis",true);if(score>=nextHeartScore && level<5 && hearts.length===0){spawnHeart();nextHeartScore=99999999}if(score>=nextBossScore && !boss){spawnBoss();nextBossScore+=1000}}
-function collectHeart(h){shipShape=(shipShape+1)%4;p.color=["#2e9fdb","#ff8cc6","#8cffb1","#ffd966"][shipShape];weapon=Math.max(1,weapon);addText(W/2,H*.32,"💛 LAEV MUUTUS",true);boom(h.x,h.y,true);if(level<5){level++;levelScore=score;nextHeartScore=score+500+level*250;addText(W/2,H*.42,"LEVEL "+level,true)}else addText(W/2,H*.42,"MAX LEVEL",true)}
+function collectHeart(h){shipShape=(shipShape+1)%4;p.color=["#2e9fdb","#ff8cc6","#8cffb1","#ffd966"][shipShape];weapon=Math.max(1,weapon);addText(W/2,H*.32,"💛 LAEV MUUTUS",true);boom(h.x,h.y,true);if(level<5){level++;levelScore=score;nextHeartScore=score+250+level*125;addText(W/2,H*.42,"LEVEL "+level,true)}else addText(W/2,H*.42,"MAX LEVEL",true)}
 function hitCircleRect(o){let rx=p.x-p.w*S/2,ry=p.y-p.h*S/2,rw=p.w*S,rh=p.h*S;let hx=clamp(o.x,rx,rx+rw),hy=clamp(o.y,ry,ry+rh),dx=o.x-hx,dy=o.y-hy;return dx*dx+dy*dy<o.r*o.r}
 function update(){if(!running||paused)return;
  if(leftHeld)p.targetX-=10*S;if(rightHeld)p.targetX+=10*S;if(hasTilt&&!touch&&!leftHeld&&!rightHeld)p.targetX=W/2+tilt*(W*.42);p.targetX=clamp(p.targetX,p.w*S/2,W-p.w*S/2);p.x+=clamp((p.targetX-p.x)*.24,-12*S,12*S);

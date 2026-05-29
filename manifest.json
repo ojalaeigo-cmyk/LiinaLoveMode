@@ -1,10 +1,11 @@
 {
   "name": "LOVE Liina",
   "short_name": "LOVE Liina",
-  "start_url": "./?level5heartboss=1",
+  "start_url": "./?boss5x_hearts2x=1",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#071018",
-  "theme_color": "#071018"
+  "theme_color": "#071018",
+  "description": "LOVE Liina: boss 5x longer and hearts 2x more often."
 }
